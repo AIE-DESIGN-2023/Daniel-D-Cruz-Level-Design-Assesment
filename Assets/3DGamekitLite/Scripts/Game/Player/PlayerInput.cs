@@ -19,6 +19,7 @@ public class PlayerInput : MonoBehaviour
     protected Vector2 m_Movement;
     protected Vector2 m_Camera;
     protected bool m_Jump;
+    protected bool m_DoubleJump;
     protected bool m_Attack;
     protected bool m_Pause;
     protected bool m_ExternalInputBlocked;
@@ -47,6 +48,12 @@ public class PlayerInput : MonoBehaviour
     {
         get { return m_Jump && !playerControllerInputBlocked && !m_ExternalInputBlocked; }
     }
+    public bool DoubleJump
+    {
+      
+        get { return m_DoubleJump && !playerControllerInputBlocked && !m_ExternalInputBlocked; }
+    }
+    public bool IsGrounded = true;
 
     public bool Attack
     {
@@ -79,7 +86,11 @@ public class PlayerInput : MonoBehaviour
         m_Movement.Set(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         m_Camera.Set(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
         m_Jump = Input.GetButton("Jump");
-
+       
+        if (!IsGrounded)
+        {
+            m_DoubleJump = Input.GetButtonDown("Jump");
+        }
         if (Input.GetButtonDown("Fire1"))
         {
             if (m_AttackWaitCoroutine != null)

@@ -9,7 +9,7 @@ namespace Gamekit3D
     [RequireComponent(typeof(Animator))]
     public class PlayerController : MonoBehaviour, IMessageReceiver
     {
-        protected static PlayerController s_Instance;
+        public static PlayerController s_Instance;
         public static PlayerController instance { get { return s_Instance; } }
 
         public bool respawning { get { return m_Respawning; } }
@@ -20,7 +20,7 @@ namespace Gamekit3D
         public float minTurnSpeed = 400f;         // How fast Ellen turns when moving at maximum speed.
         public float maxTurnSpeed = 1200f;        // How fast Ellen turns when stationary.
         public float idleTimeout = 5f;            // How long before Ellen starts considering random idles.
-        public bool canAttack;                    // Whether or not Ellen can swing her staff.
+        public bool canAttack;                    // Whether or not Ellen can swing her staff.       
 
         public CameraSettings cameraSettings;            // Reference used to determine the camera's direction.
         public MeleeWeapon meleeWeapon;                  // Reference used to (de)activate the staff when attacking. 
@@ -41,6 +41,8 @@ namespace Gamekit3D
         protected bool m_IsGrounded = true;            // Whether or not Ellen is currently standing on the ground.
         protected bool m_PreviouslyGrounded = true;    // Whether or not Ellen was standing on the ground last frame.
         protected bool m_ReadyToJump;                  // Whether or not the input state and Ellen are correct to allow jumping.
+        protected bool canDoubleJump = false;
+        private bool hasDoubleJumped = false;
         protected float m_DesiredForwardSpeed;         // How fast Ellen aims be going along the ground based on input.
         protected float m_ForwardSpeed;                // How fast Ellen is currently going along the ground.
         protected float m_VerticalSpeed;               // How fast Ellen is currently moving up or down.
@@ -108,6 +110,11 @@ namespace Gamekit3D
         public void SetCanAttack(bool canAttack)
         {
             this.canAttack = canAttack;
+        }
+
+        public void SetCanDoubleJump(bool canDouble)
+        {
+            this.canDoubleJump = canDouble;
         }
 
         // Called automatically by Unity when the script is first added to a gameobject or is reset from the context menu.
@@ -178,7 +185,7 @@ namespace Gamekit3D
         }
 
         // Called automatically by Unity once every Physics step.
-        void FixedUpdate()
+        void Update()
         {
             CacheAnimatorState();
 
@@ -309,7 +316,21 @@ namespace Gamekit3D
                 
                 // If Ellen is airborne, apply gravity.
                 m_VerticalSpeed -= gravity * Time.deltaTime;
+
+                if (canDoubleJump && !hasDoubleJumped)
+                {
+                    if (m_Input.DoubleJump)
+                    {
+                        Debug.Log("double jump");
+
+                        m_VerticalSpeed = jumpSpeed;
+                        hasDoubleJumped = true;
+                        OnAnimatorMove();
+                    }
+                }
             }
+
+            
         }
 
         // Called each physics step to set the rotation Ellen is aiming to have.
@@ -493,7 +514,7 @@ namespace Gamekit3D
         void OnAnimatorMove()
         {
             Vector3 movement;
-
+            
             // If Ellen is on the ground...
             if (m_IsGrounded)
             {
@@ -516,6 +537,7 @@ namespace Gamekit3D
                     movement = m_Animator.deltaPosition;
                     m_CurrentWalkingSurface = null;
                 }
+                hasDoubleJumped = false;
             }
             else
             {
@@ -534,6 +556,7 @@ namespace Gamekit3D
 
             // After the movement store whether or not the character controller is grounded.
             m_IsGrounded = m_CharCtrl.isGrounded;
+            m_Input.IsGrounded = m_CharCtrl.isGrounded;
 
             // If Ellen is not on the ground then send the vertical speed to the animator.
             // This is so the vertical speed is kept when landing so the correct landing animation is played.
@@ -542,6 +565,7 @@ namespace Gamekit3D
 
             // Send whether or not Ellen is on the ground to the animator.
             m_Animator.SetBool(m_HashGrounded, m_IsGrounded);
+
         }
         
         // This is called by an animation event when Ellen swings her staff.
