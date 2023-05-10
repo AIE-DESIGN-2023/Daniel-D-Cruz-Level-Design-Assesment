@@ -15,9 +15,7 @@ MonoBehaviour:
   language: English
   phrases:
   - key: EX_ACID
-    value: The Acid Prefab uses a Box Collider set to 'Trigger' to check when Ellen
-      has fallen into it. The DeathVolume component will then force Ellen to respawn
-      at her latest checkpoint
+    value: Hello good boy
   - key: EX_PAD
     value: 'This pressure pad uses the ''Send on Trigger Enter'' component to open
       the door when Ellen enters the pad''s box collider. Once the pad is triggered,
@@ -35,14 +33,14 @@ MonoBehaviour:
       particles and smaller phsyics-enabled cubes
   - key: EX_MOVPLAT
     value: This moving platform uses the SimpleTranslator component. Start and End
-      points are shown as gizmos in the scene view to easily customise the start and
-      end positions
+      points are shown as gizmos in the scene view to easily customise the start
+      and end positions
   - key: EX_ENEMY
     value: Chomper likes to bite and Spitter will attack from range. You can easily
       make changes to their behaviour using their Chomper and Spitter components!
   - key: PP_SIDE
-    value: I'm not heavy enough to press this... Looks like I'll have to use the box
-      above!
+    value: I'm not heavy enough to press this... Looks like I'll have to use the
+      box above!
   - key: SWTCH_HOUSE
     value: It's locked... Maybe one of the boxes will have a key inside...
   - key: BOX_PCKUP
